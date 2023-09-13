@@ -1,5 +1,5 @@
-#ifndef SHARED_UTILS_CONFIG_H_
-#define SHARED_UTILS_CONFIG_H_
+#ifndef SHARED_INCLUDE_CONFIG_H_
+#define SHARED_INCLUDE_CONFIG_H_
 
 #include<stdio.h>
 #include<string.h>
@@ -53,6 +53,6 @@ typedef struct{
 	int RETARDO_ACCESO_FAT;
 }t_config_filesystem;
 
-int iniciar_config(char* ruta_config, t_log* logger, int (*cargar_config)(t_config* config, t_log* logger));
+t_config* iniciar_config(char* ruta_config, t_log* logger);
 
-#endif /* SHARED_UTILS_CONFIG_H_ */
+#endif /* SHARED_INCLUDE_CONFIG_H_ */

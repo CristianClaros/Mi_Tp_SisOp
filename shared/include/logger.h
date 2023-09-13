@@ -1,5 +1,5 @@
-#ifndef SHARED_UTILS_LOGGER_H_
-#define SHARED_UTILS_LOGGER_H_
+#ifndef SHARED_INCLUDE_LOGGER_H_
+#define SHARED_INCLUDE_LOGGER_H_
 
 #include<stdio.h>
 #include<string.h>
@@ -9,4 +9,4 @@
 
 t_log* iniciar_logger(char* ruta_log, char* name_log);
 
-#endif /* SHARED_UTILS_LOGGER_H_ */
+#endif /* SHARED_INCLUDE_LOGGER_H_ */

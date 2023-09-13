@@ -1,19 +1,22 @@
-#include "../utils/config.h"
+#include "../include/config.h"
 
-int iniciar_config(char* ruta_config, t_log* logger, int (*cargar_config)(t_config* config, t_log* logger)){
+t_config* iniciar_config(char* ruta_config, t_log* logger){
 	t_config* config = config_create(ruta_config);
 
 	if(!config){
 		perror("ERROR AL CREAR EL CONFIG!!!\n");
 		return -1;
 	}
+	return config;
+}
 
-	if(cargar_config(config, logger) != 1){
-		perror("ERROR AL CARGAR DATOS DEL CONFIG!!!\n");
+int eliminar_config(t_config* config, t_log* logger){
+	if(!config){
+		perror("CONFIG NUNCA FUE CREADO!!!\n");
 		return -1;
 	}
 
-	log_info(logger, "DATOS DEL CONFIG CARGADOS CORRECTAMENTE!!!\n");
-
+	config_destroy(config);
+	log_info(logger, "CONFIG BORRADO CORRECTAMENTE!!!\n");
 	return 1;
 }
