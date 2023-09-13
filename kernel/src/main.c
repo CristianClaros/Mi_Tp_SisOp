@@ -16,5 +16,7 @@ int main(int argc, char** argv ){
 		return -1;
 	}
 
+	activar_kernel(kernel_datos, logger_kernel);
+
 	return 0;
 }
