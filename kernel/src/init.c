@@ -9,20 +9,20 @@ t_config_kernel* cargar_config_kernel(t_config* config, t_log* logger){
 	kernel_struct->IP_MEMORIA = strdup(config_get_string_value(config, "IP_MEMORIA"));
 	log_info(logger, "IP_MEMORIA: %s", kernel_struct->IP_MEMORIA);
 
-	kernel_struct->PUERTO_MEMORIA = config_get_int_value(config, "PUERTO_MEMORIA");
-	log_info(logger, "PUERTO_MEMORIA: %i", kernel_struct->PUERTO_MEMORIA);
+	kernel_struct->PUERTO_MEMORIA = strdup(config_get_string_value(config, "PUERTO_MEMORIA"));
+	log_info(logger, "PUERTO_MEMORIA: %s", kernel_struct->PUERTO_MEMORIA);
 
 	kernel_struct->IP_FILESYSTEM = strdup(config_get_string_value(config, "IP_FILESYSTEM"));
 	log_info(logger, "IP_FILESYSTEM: %s", kernel_struct->IP_FILESYSTEM);
 
-	kernel_struct->PUERTO_FILESYSTEM = config_get_int_value(config, "PUERTO_FILESYSTEM");
-	log_info(logger, "PUERTO_FILESYSTEM: %i", kernel_struct->PUERTO_FILESYSTEM);
+	kernel_struct->PUERTO_FILESYSTEM = strdup(config_get_string_value(config, "PUERTO_FILESYSTEM"));
+	log_info(logger, "PUERTO_FILESYSTEM: %s", kernel_struct->PUERTO_FILESYSTEM);
 
 	kernel_struct->IP_CPU = strdup(config_get_string_value(config, "IP_CPU"));
 	log_info(logger, "IP_CPU: %s", kernel_struct->IP_CPU);
 
-	kernel_struct->PUERTO_CPU = config_get_int_value(config, "PUERTO_CPU");
-	log_info(logger, "PUERTO_CPU: %i", kernel_struct->PUERTO_CPU);
+	kernel_struct->PUERTO_CPU = strdup(config_get_string_value(config, "PUERTO_CPU"));
+	log_info(logger, "PUERTO_CPU: %s", kernel_struct->PUERTO_CPU);
 
 	kernel_struct->ALGORITMO_PLANIFICACION = strdup(config_get_string_value(config, "ALGORITMO_PLANIFICACION"));
 	log_info(logger, "ALGORITMO_PLANIFICACION: %s", kernel_struct->ALGORITMO_PLANIFICACION);

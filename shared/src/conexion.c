@@ -1,20 +1,19 @@
 #include "../include/conexion.h"
 
-void* crearServidor(t_log* logger, char* name_server, char* ip_server, int puerto_server, int puerto, int socket){
-    puerto_server = puerto;
-    socket = iniciar_servidor(logger, name_server, ip_server, puerto_server);
-    if (socket == 0) {
+void crearServidor(t_log* logger, char* name_server, char* ip_server, char* puerto_server, int* socket_server){
+    socket_server = iniciar_servidor(logger, name_server, ip_server, puerto_server);
+
+    if (socket_server == -1) {
         log_error(logger, "FALLO AL CREAR EL SERVIDOR, CERRANDO %s", name_server);
-        return -1;
     }
 
-    while (server_escuchar(logger, name_server, socket));
+    server_escuchar(logger, name_server , socket_server);
+//    while (server_escuchar(logger, name_server, socket_server));
 
-    return 1;
 }
 
 // INICIA SERVER ESCUCHANDO EN IP:PUERTO
-int iniciar_servidor(t_log* logger, const char* name, char* ip, char* puerto){
+int iniciar_servidor(t_log* logger, const char* name_server, char* ip_server, char* puerto_server){
     int socket_servidor;
     struct addrinfo hints, *servinfo;
 
@@ -25,65 +24,62 @@ int iniciar_servidor(t_log* logger, const char* name, char* ip, char* puerto){
     hints.ai_flags = AI_PASSIVE;
 
     // Recibe los addrinfo
-    getaddrinfo(ip, puerto, &hints, &servinfo);
+    getaddrinfo(ip_server, puerto_server, &hints, &servinfo);
 
-    bool conecto = false;
+    //Creo un socket servidor
+    socket_servidor = 0;
 
-    // Itera por cada addrinfo devuelto
-    for (struct addrinfo *p = servinfo; p != NULL; p = p->ai_next) {
-        socket_servidor = socket(p->ai_family, p->ai_socktype, p->ai_protocol);
-        if (socket_servidor == -1) // fallo de crear socket
-            continue;
-        int yes=1;
-        setsockopt(socket_servidor, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof yes);
-        if (bind(socket_servidor, p->ai_addr, p->ai_addrlen) == -1) {
-            // Si entra aca fallo el bind
-            perror("ERROR EN EL BIND!!!\n");
-            close(socket_servidor);
-            continue;
-        }
-        // Ni bien conecta uno nos vamos del for
-        conecto = true;
-        break;
+    socket_servidor = socket(servinfo->ai_family, servinfo->ai_socktype, servinfo->ai_protocol);
+
+    if(socket_servidor == -1){
+    	perror("NO PUEDE CREARSE EL SERVIDOR!!!\n");
     }
 
-    if(!conecto) {
-        free(servinfo);
-        return 0;
+    if(bind(socket_servidor, servinfo->ai_addr, servinfo->ai_addrlen) == -1){
+    	perror("ERROR EN EL BIND!!!\n");
     }
 
-    listen(socket_servidor, SOMAXCONN); // Escuchando (hasta SOMAXCONN conexiones simultaneas)
-
-    // Aviso al logger
-    log_info(logger, "Escuchando en puerto: %s (%s)\n", ip, puerto, name);
+    //Asociamos y escuhamos atraves del puerto
+    if(listen(socket_servidor,SOMAXCONN) == -1){
+    	perror("ERROR EN EL LISTEN!!!\n");
+    }
 
     freeaddrinfo(servinfo);
+
+    // Aviso al logger
+    log_info(logger, "Escuchando en puerto: %s (%s)\n", ip_server, puerto_server, name_server);
 
     return socket_servidor;
 }
 
-int server_escuchar(t_log *logger, char *server_name, int server_socket){
-    int cliente_socket = esperar_cliente(logger, server_name, server_socket);
+int server_escuchar(t_log *logger, char* server_name, int socket_server){
+    int cliente_socket = esperar_cliente(logger, server_name, socket_server);
 
-    if (cliente_socket != -1) {
-        pthread_t atenderProcesoNuevo;
-        t_procesar_conexion_args *args = malloc(sizeof(t_procesar_conexion_args));
-        args->log = logger;
-        args->fd = cliente_socket;
-        args->server_name = server_name;
-        pthread_create(&atenderProcesoNuevo, NULL,procesar_conexion,args);
-        pthread_detach(atenderProcesoNuevo);
-        return 1;
-    }
+    t_procesar_conexion_args* args = malloc(sizeof(t_procesar_conexion_args));
+    args->log = logger;
+    args->fd = cliente_socket;
+    args->server_name = server_name;
+
+    procesar_conexion(args);
+
+//    if (cliente_socket != -1) {
+//        pthread_t atenderProcesoNuevo;
+//        t_procesar_conexion_args *args = malloc(sizeof(t_procesar_conexion_args));
+//        args->log = logger;
+//        args->fd = cliente_socket;
+//        args->server_name = server_name;
+//        pthread_create(&atenderProcesoNuevo, NULL,procesar_conexion,args);
+//        pthread_detach(atenderProcesoNuevo);
+//        return 1;
+//    }
     return 0;
 }
 
-void procesar_conexion(void *void_args){
-    t_procesar_conexion_args *args = (t_procesar_conexion_args *) void_args;
-    t_log* logger = args->log;
-    int cliente_socket = args->fd;
-    char *server_name = args->server_name;
-    free(args);
+void procesar_conexion(t_procesar_conexion_args* void_args){
+
+    t_log* logger = void_args->log;
+    int cliente_socket = void_args->fd;
+    char *server_name = void_args->server_name;
 
     op_code cop;
     while (cliente_socket != -1) {
@@ -173,21 +169,17 @@ int crear_conexion(t_log* logger, const char* server_name, char* ip, char* puert
     getaddrinfo(ip, puerto, &hints, &servinfo);
 
     // Crea un socket con la informacion recibida (del primero, suficiente)
-    int socket_cliente = socket(servinfo->ai_family, servinfo->ai_socktype, servinfo->ai_protocol);
-    int yes=1;
-    setsockopt(socket_cliente, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof yes);
+    int socket_cliente = 0;
+
     // Fallo en crear el socket
-    if(socket_cliente == -1) {
-        log_error(logger, "Error creando el socket para %s", ip, puerto);
-        log_error(logger, "y puerto %s", puerto);
-        //freeaddrinfo(servinfo);
-        return 0;
+    if((socket_cliente = socket(servinfo->ai_family, servinfo->ai_socktype, servinfo->ai_protocol)) == -1) {
+        log_info(logger, "ERROR AL CREAR EL SOCKET CLIENTE!!!\n");
+        return -1;
     }
 
     // Error conectando
     if(connect(socket_cliente, servinfo->ai_addr, servinfo->ai_addrlen) == -1) {
         log_error(logger, "Error al conectar (a %s)\n", server_name);
-        freeaddrinfo(servinfo);
         return 0;
     } else
         log_info(logger, "Cliente conectado en %s:%s (a %s)\n", ip, puerto, server_name);
@@ -199,32 +191,37 @@ int crear_conexion(t_log* logger, const char* server_name, char* ip, char* puert
 
 // ESPERAR CONEXION DE CLIENTE EN UN SERVER ABIERTO
 int esperar_cliente(t_log* logger, const char* name, int socket_servidor){
-    struct sockaddr_in dir_cliente;
-    socklen_t tam_direccion = sizeof(struct sockaddr_in);
+    int socket_cliente;
 
-    int socket_cliente = accept(socket_servidor, (void*) &dir_cliente, &tam_direccion);
+    if((socket_cliente = accept(socket_servidor, NULL, NULL)) == -1){
+    	perror("ERROR EN EL ACCEPT!!!\n");
+    	return -1;
+    }
 
     log_info(logger, "Cliente conectado (a %s)\n", name);
 
     return socket_cliente;
 }
 
-//void generarConexionesConCPU(){
-//    char* ip;
-//
-//    ip = strdup(cfg_kernel->IP_CPU);
-//    log_info(logger_kernel,"Lei la ip %s", ip);
-//
-//    char* puertoDispatch;
-//    puertoDispatch = strdup(cfg_kernel->PUERTO_CPU);
-//
-//    log_info(logger_kernel,"Lei el puerto %s", puertoDispatch);
-//
-//    fd_dispatch = crear_conexion(
-//            logger_kernel,
-//            "SERVER CPU DISPATCH",
-//            ip,
-//            puertoDispatch
-//    );
-//}
+//Conexiones con modulos
 
+int conectar_CPU(t_log* logger, char* server_name, char* ip, char* puerto){
+
+	crear_conexion(logger, server_name, ip, puerto);
+
+	return 1;
+}
+
+int conectar_MEMORIA(t_log* logger, char* server_name, char* ip, char* puerto){
+
+	crear_conexion(logger, server_name, ip, puerto);
+
+	return 1;
+}
+
+int conectar_FILESYSTEM(t_log* logger, char* server_name, char* ip, char* puerto){
+
+	crear_conexion(logger, server_name, ip, puerto);
+
+	return 1;
+}

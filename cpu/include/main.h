@@ -1,6 +1,7 @@
-#ifndef KERNEL_UTILS_MAIN_H_
-#define KERNEL_UTILS_MAIN_H_
+#ifndef CPU_INCLUDE_MAIN_H_
+#define CPU_INCLUDE_MAIN_H_
 
 #include "../include/init.h"
+#include "../include/conexion.h"
 
-#endif /* KERNEL_UTILS_MAIN_H_ */
+#endif /* CPU_INCLUDE_MAIN_H_ */

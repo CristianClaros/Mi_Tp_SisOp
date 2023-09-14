@@ -17,6 +17,7 @@ int main(int argc, char** argv ){
 		return -1;
 	}
 
+	iniciar_filesystem(filesystem_datos, logger_filesystem);
 
 	return 0;
 }

@@ -3,7 +3,8 @@
 
 #include "../../shared/include/config.h"
 #include "../../shared/include/logger.h"
+#include "../../shared/include/conexion.h"
 
-int activar_kernel(t_config_kernel* kernel_datos, t_log* logger_kernel);
+int iniciar_kernel(t_config_kernel* kernel_datos, t_log* logger_kernel);
 
 #endif /* KERNEL_INCLUDE_CONEXION_H_ */

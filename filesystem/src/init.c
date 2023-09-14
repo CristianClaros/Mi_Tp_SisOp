@@ -6,11 +6,11 @@ t_config_filesystem* cargar_config_filesystem(t_config* config, t_log* logger){
 	filesystem_struct->IP_MEMORIA = strdup(config_get_string_value(config, "IP_MEMORIA"));
 	log_info(logger, "IP_MEMORIA: %s", filesystem_struct->IP_MEMORIA);
 
-	filesystem_struct->PUERTO_MEMORIA = config_get_int_value(config, "PUERTO_MEMORIA");
-	log_info(logger, "PUERTO_MEMORIA: %i", filesystem_struct->PUERTO_MEMORIA);
+	filesystem_struct->PUERTO_MEMORIA = strdup(config_get_string_value(config, "PUERTO_MEMORIA"));
+	log_info(logger, "PUERTO_MEMORIA: %s", filesystem_struct->PUERTO_MEMORIA);
 
-	filesystem_struct->PUERTO_ESCUCHA = config_get_int_value(config, "PUERTO_ESCUCHA");
-	log_info(logger, "PUERTO_ESCUCHA: %i", filesystem_struct->PUERTO_ESCUCHA);
+	filesystem_struct->PUERTO_ESCUCHA = strdup(config_get_string_value(config, "PUERTO_ESCUCHA"));
+	log_info(logger, "PUERTO_ESCUCHA: %s", filesystem_struct->PUERTO_ESCUCHA);
 
 	filesystem_struct->PATH_FAT = strdup(config_get_string_value(config, "PATH_FAT"));
 	log_info(logger, "PATH_FAT: %s", filesystem_struct->PATH_FAT);

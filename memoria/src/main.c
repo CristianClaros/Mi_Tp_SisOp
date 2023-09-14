@@ -17,6 +17,8 @@ int main(int argc, char** argv ){
 		return -1;
 	}
 
+	iniciar_memoria(memoria_datos, logger_memoria);
+
 
 	return 0;
 }

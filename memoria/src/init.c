@@ -3,14 +3,14 @@
 t_config_memoria* cargar_config_memoria(t_config* config, t_log* logger){
 	t_config_memoria* memoria_struct = malloc(sizeof(t_config_memoria));
 
-	memoria_struct->PUERTO_ESCUCHA = config_get_int_value(config, "PUERTO_ESCUCHA");
-	log_info(logger, "PUERTO_ESCUCHA: %i", memoria_struct->PUERTO_ESCUCHA);
+	memoria_struct->PUERTO_ESCUCHA = strdup(config_get_string_value(config, "PUERTO_ESCUCHA"));
+	log_info(logger, "PUERTO_ESCUCHA: %s", memoria_struct->PUERTO_ESCUCHA);
 
 	memoria_struct->IP_FILESYSTEM = strdup(config_get_string_value(config, "IP_FILESYSTEM"));
 	log_info(logger, "IP_FILESYSTEM: %s", memoria_struct->IP_FILESYSTEM);
 
-	memoria_struct->PUERTO_FILESYSTEM = config_get_int_value(config, "PUERTO_FILESYSTEM");
-	log_info(logger, "PUERTO_FILESYSTEM: %i", memoria_struct->PUERTO_FILESYSTEM);
+	memoria_struct->PUERTO_FILESYSTEM = strdup(config_get_string_value(config, "PUERTO_FILESYSTEM"));
+	log_info(logger, "PUERTO_FILESYSTEM: %s", memoria_struct->PUERTO_FILESYSTEM);
 
 	memoria_struct->TAM_MEMORIA = config_get_int_value(config, "TAM_MEMORIA");
 	log_info(logger, "TAM_MEMORIA: %i", memoria_struct->TAM_MEMORIA);

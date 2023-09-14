@@ -9,11 +9,11 @@
 
 typedef struct{
 	char* IP_MEMORIA;
-	int PUERTO_MEMORIA;
+	char* PUERTO_MEMORIA;
 	char* IP_FILESYSTEM;
-	int PUERTO_FILESYSTEM;
+	char* PUERTO_FILESYSTEM;
 	char* IP_CPU;
-	int PUERTO_CPU;
+	char* PUERTO_CPU;
 	char* ALGORITMO_PLANIFICACION;
 	int QUANTUM;
 	char** RECURSOS;
@@ -23,15 +23,15 @@ typedef struct{
 
 typedef struct{
 	char* IP_MEMORIA;
-	int PUERTO_MEMORIA;
-	int PUERTO_ESCUCHA_DISPATCH;
-	int PUERTO_INTERRUPT;
+	char* PUERTO_MEMORIA;
+	char* PUERTO_ESCUCHA_DISPATCH;
+	char* PUERTO_INTERRUPT;
 }t_config_cpu;
 
 typedef struct{
-	int PUERTO_ESCUCHA;
+	char* PUERTO_ESCUCHA;
 	char* IP_FILESYSTEM;
-	int PUERTO_FILESYSTEM;
+	char* PUERTO_FILESYSTEM;
 	int TAM_MEMORIA;
 	int TAM_PAGINA;
 	char* PATH_INSTRUCCIONES;
@@ -41,8 +41,8 @@ typedef struct{
 
 typedef struct{
 	char* IP_MEMORIA;
-	int PUERTO_MEMORIA;
-	int PUERTO_ESCUCHA;
+	char* PUERTO_MEMORIA;
+	char* PUERTO_ESCUCHA;
 	char* PATH_FAT;
 	char* PATH_BLOQUES;
 	char* PATH_FCB;

@@ -17,6 +17,7 @@ int main(int argc, char** argv ){
 		return -1;
 	}
 
+	iniciar_cpu(cpu_datos, logger_cpu);
 
 	return 0;
 }
