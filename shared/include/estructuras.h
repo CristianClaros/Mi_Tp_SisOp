@@ -23,8 +23,8 @@ typedef enum
     PROCESO_TERMINADO,
     //------------------------------------------------------------------------------
     //-------------MENSAJES SERIALIZACION GLOBALES---------------------------------
-    PAQUETE = 3,
-    MENSAJE,
+    PAQUETE = 4,
+    MENSAJE = 5,
     PCB = 30,
     //MENSAJES KERNEL - MEMORIA
     TABLA_SEGMENTOS_INICIAL,

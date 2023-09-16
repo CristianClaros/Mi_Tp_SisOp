@@ -54,8 +54,5 @@
 	</storageModule>
 	<storageModule moduleId="scannerConfiguration">
 		<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
-		<scannerConfigBuildInfo instanceId="cdt.managedbuild.toolchain.gnu.base.1527428885;cdt.managedbuild.toolchain.gnu.base.1527428885.68314767;cdt.managedbuild.tool.gnu.c.compiler.base.421614819;cdt.managedbuild.tool.gnu.c.compiler.input.846414425">
-			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
-		</scannerConfigBuildInfo>
 	</storageModule>
 </cproject>

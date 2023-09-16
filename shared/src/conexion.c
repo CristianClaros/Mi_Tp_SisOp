@@ -1,13 +1,13 @@
 #include "../include/conexion.h"
 
-void crearServidor(t_log* logger, char* name_server, char* ip_server, char* puerto_server, int* socket_server){
+void crearServidor(t_log* logger, char* name_server, char* ip_server, char* puerto_server, int* socket_server, void (*procesar_conexion)(t_procesar_conexion_args* args)){
     socket_server = iniciar_servidor(logger, name_server, ip_server, puerto_server);
 
     if (socket_server == -1) {
         log_error(logger, "FALLO AL CREAR EL SERVIDOR, CERRANDO %s", name_server);
     }
 
-    server_escuchar(logger, name_server , socket_server);
+    server_escuchar(logger, name_server , socket_server,procesar_conexion);
 //    while (server_escuchar(logger, name_server, socket_server));
 
 }
@@ -52,7 +52,7 @@ int iniciar_servidor(t_log* logger, const char* name_server, char* ip_server, ch
     return socket_servidor;
 }
 
-int server_escuchar(t_log *logger, char* server_name, int socket_server){
+int server_escuchar(t_log *logger, char* server_name, int socket_server, void (*procesar_conexion)(t_procesar_conexion_args* args)){
     int cliente_socket = esperar_cliente(logger, server_name, socket_server);
 
     t_procesar_conexion_args* args = malloc(sizeof(t_procesar_conexion_args));
@@ -75,86 +75,86 @@ int server_escuchar(t_log *logger, char* server_name, int socket_server){
     return 0;
 }
 
-void procesar_conexion(t_procesar_conexion_args* void_args){
-
-    t_log* logger = void_args->log;
-    int cliente_socket = void_args->fd;
-    char *server_name = void_args->server_name;
-
-    op_code cop;
-    while (cliente_socket != -1) {
-
-        if (recv(cliente_socket, &cop, sizeof(op_code), 0) != sizeof(op_code)) {
-            log_info(logger, "DISCONNECT!");
-            return;
-        }
-
-        switch (cop) {
-            //----------------------------------------CONSOLA-----------------------
-            case GESTIONAR_CONSOLA_NUEVA:
-            {
-                pthread_t procesoNuevo;
-                /*t_procesar_fd_conexion* conexion = malloc(sizeof(t_procesar_fd_conexion));
-                conexion->conexion = cliente_socket;*/
-//                pthread_create(&procesoNuevo,NULL, atenderProcesoNuevo,cliente_socket);
-//                pthread_join(procesoNuevo, NULL);
-//                atenderProcesoNuevo(conexion->conexion);
-
-                log_info(logger,"INSTRUCCIONES LISTAS");
-                break;
-            }
-
-                //----------------------------------MEMORIA----------------------------------------
-            case TABLA_SEGMENTOS_INICIAL:
-            {
-                //ACA SE RECIBIRIA LA BASE DEL SEGMENTO COMPARTIDO DONDE ESTA
-//                pthread_mutex_lock(&BASE_INICIAL);
-//                base_segmento_0 = recibir_base_segmento_0(cliente_socket);
-                //HAY QUE ASIGNAR ESA BASE AL PROCESO.
-                break;
-            }
-            case CREAR_SEGMENTO:
-            {
-                //El Kernel deberá enviarle a la Memoria el mensaje para crear un segmento con el tamaño definido
-                break;
-            }
-            case SEGMENTO_CREADO:
-            {
-                //El segmento se creo exitosamente y la memoria nos devuelvio la base del nuevo segmento.
-                break;
-            }
-            case ESPACIO_INSUFICIENTE:
-            {
-                //No se tiene más espacio disponible en la memoria y por lo tanto el proceso tiene que finalizar con error Out of Memory.
-                break;
-            }
-            case COMPACTACION:
-            {
-                /*Se tiene el espacio disponible, pero el mismo no se encuentra contiguo,
-                  por lo que se debe compactar, este caso lo vamos a analizar más en detalle,
-                  ya que involucra controlar las operaciones de File System que se estén ejecutando.*/
-                break;
-            }
-            case BORRAR_SEGMENTO:
-            {
-                /*Para realizar un DELETE_SEGMENT, el Kernel deberá enviarle a la Memoria el Id del
-                  segmento a eliminar y recibirá como respuesta de la Memoria la tabla de segmentos actualizada.
-                  Nota: No se solicitará nunca la eliminación del segmento 0 o de un segmento inexistente.*/
-                break;
-            }
-            case -1:
-                log_error(logger, "Cliente desconectado de %s...", server_name);
-                return;
-            default:
-                log_error(logger, "Algo anduvo mal en el server de %s", server_name);
-                log_info(logger, "Cop: %d", cop);
-                return;
-        }
-    }
-
-    log_warning(logger, "El cliente se desconecto de %s server", server_name);
-    return;
-}
+//void procesar_conexion(t_procesar_conexion_args* void_args){
+//
+//    t_log* logger = void_args->log;
+//    int cliente_socket = void_args->fd;
+//    char *server_name = void_args->server_name;
+//
+//    op_code cop;
+//    while (cliente_socket != -1) {
+//
+//        if (recv(cliente_socket, &cop, sizeof(op_code), 0) != sizeof(op_code)) {
+//            log_info(logger, "DISCONNECT!");
+//            return;
+//        }
+//
+//        switch (cop) {
+//            //----------------------------------------CONSOLA-----------------------
+//            case GESTIONAR_CONSOLA_NUEVA:
+//            {
+//                pthread_t procesoNuevo;
+//                /*t_procesar_fd_conexion* conexion = malloc(sizeof(t_procesar_fd_conexion));
+//                conexion->conexion = cliente_socket;*/
+////                pthread_create(&procesoNuevo,NULL, atenderProcesoNuevo,cliente_socket);
+////                pthread_join(procesoNuevo, NULL);
+////                atenderProcesoNuevo(conexion->conexion);
+//
+//                log_info(logger,"INSTRUCCIONES LISTAS");
+//                break;
+//            }
+//
+//                //----------------------------------MEMORIA----------------------------------------
+//            case TABLA_SEGMENTOS_INICIAL:
+//            {
+//                //ACA SE RECIBIRIA LA BASE DEL SEGMENTO COMPARTIDO DONDE ESTA
+////                pthread_mutex_lock(&BASE_INICIAL);
+////                base_segmento_0 = recibir_base_segmento_0(cliente_socket);
+//                //HAY QUE ASIGNAR ESA BASE AL PROCESO.
+//                break;
+//            }
+//            case CREAR_SEGMENTO:
+//            {
+//                //El Kernel deberá enviarle a la Memoria el mensaje para crear un segmento con el tamaño definido
+//                break;
+//            }
+//            case SEGMENTO_CREADO:
+//            {
+//                //El segmento se creo exitosamente y la memoria nos devuelvio la base del nuevo segmento.
+//                break;
+//            }
+//            case ESPACIO_INSUFICIENTE:
+//            {
+//                //No se tiene más espacio disponible en la memoria y por lo tanto el proceso tiene que finalizar con error Out of Memory.
+//                break;
+//            }
+//            case COMPACTACION:
+//            {
+//                /*Se tiene el espacio disponible, pero el mismo no se encuentra contiguo,
+//                  por lo que se debe compactar, este caso lo vamos a analizar más en detalle,
+//                  ya que involucra controlar las operaciones de File System que se estén ejecutando.*/
+//                break;
+//            }
+//            case BORRAR_SEGMENTO:
+//            {
+//                /*Para realizar un DELETE_SEGMENT, el Kernel deberá enviarle a la Memoria el Id del
+//                  segmento a eliminar y recibirá como respuesta de la Memoria la tabla de segmentos actualizada.
+//                  Nota: No se solicitará nunca la eliminación del segmento 0 o de un segmento inexistente.*/
+//                break;
+//            }
+//            case -1:
+//                log_error(logger, "Cliente desconectado de %s...", server_name);
+//                return;
+//            default:
+//                log_error(logger, "Algo anduvo mal en el server de %s", server_name);
+//                log_info(logger, "Cop: %d", cop);
+//                return;
+//        }
+//    }
+//
+//    log_warning(logger, "El cliente se desconecto de %s server", server_name);
+//    return;
+//}
 
 int crear_conexion(t_log* logger, const char* server_name, char* ip, char* puerto){
     struct addrinfo hints, *servinfo;
@@ -225,3 +225,144 @@ int conectar_FILESYSTEM(t_log* logger, char* server_name, char* ip, char* puerto
 
 	return 1;
 }
+
+//PAQUETES ENVIO
+
+void enviar_mensaje(char* mensaje, int socket_cliente)
+{
+	t_paquete* paquete = malloc(sizeof(t_paquete));
+
+	paquete->codigo_operacion = MENSAJE;
+	paquete->buffer = malloc(sizeof(t_buffer));
+	paquete->buffer->size = strlen(mensaje) + 1;
+	paquete->buffer->stream = malloc(paquete->buffer->size);
+	memcpy(paquete->buffer->stream, mensaje, paquete->buffer->size);
+
+	int bytes = paquete->buffer->size + 2*sizeof(int);
+
+	void* a_enviar = serializar_paquete(paquete, bytes);
+
+	send(socket_cliente, a_enviar, bytes, 0);
+
+	free(a_enviar);
+	eliminar_paquete(paquete);
+}
+
+void* serializar_paquete(t_paquete* paquete, int bytes)
+{
+	void * magic = malloc(bytes);
+	int desplazamiento = 0;
+
+	memcpy(magic + desplazamiento, &(paquete->codigo_operacion), sizeof(int));
+	desplazamiento+= sizeof(int);
+	memcpy(magic + desplazamiento, &(paquete->buffer->size), sizeof(int));
+	desplazamiento+= sizeof(int);
+	memcpy(magic + desplazamiento, paquete->buffer->stream, paquete->buffer->size);
+	desplazamiento+= paquete->buffer->size;
+
+	return magic;
+}
+
+void crear_buffer(t_paquete* paquete)
+{
+	paquete->buffer = malloc(sizeof(t_buffer));
+	paquete->buffer->size = 0;
+	paquete->buffer->stream = NULL;
+}
+
+t_paquete* crear_paquete(void)
+{
+	t_paquete* paquete = malloc(sizeof(t_paquete));
+	paquete->codigo_operacion = PAQUETE;
+	crear_buffer(paquete);
+	return paquete;
+}
+
+void agregar_a_paquete(t_paquete* paquete, void* valor, int tamanio)
+{
+	paquete->buffer->stream = realloc(paquete->buffer->stream, paquete->buffer->size + tamanio + sizeof(int));
+
+	memcpy(paquete->buffer->stream + paquete->buffer->size, &tamanio, sizeof(int));
+	memcpy(paquete->buffer->stream + paquete->buffer->size + sizeof(int), valor, tamanio);
+
+	paquete->buffer->size += tamanio + sizeof(int);
+}
+
+void enviar_paquete(t_paquete* paquete, int socket_cliente)
+{
+	int bytes = paquete->buffer->size + 2*sizeof(int);
+	void* a_enviar = serializar_paquete(paquete, bytes);
+
+	send(socket_cliente, a_enviar, bytes, 0);
+
+	free(a_enviar);
+}
+
+void eliminar_paquete(t_paquete* paquete)
+{
+	free(paquete->buffer->stream);
+	free(paquete->buffer);
+	free(paquete);
+}
+
+void liberar_conexion(int socket_cliente)
+{
+	close(socket_cliente);
+}
+
+
+//PAQUETE RECEPCION
+int recibir_operacion(int socket_cliente)
+{
+	int cod_op;
+	if(recv(socket_cliente, &cod_op, sizeof(int), MSG_WAITALL) > 0)
+		return cod_op;
+	else
+	{
+		close(socket_cliente);
+		return -1;
+	}
+}
+
+void* recibir_buffer(int* size, int socket_cliente)
+{
+	void * buffer;
+
+	recv(socket_cliente, size, sizeof(int), MSG_WAITALL);
+	buffer = malloc(*size);
+	recv(socket_cliente, buffer, *size, MSG_WAITALL);
+
+	return buffer;
+}
+
+void recibir_mensaje(int socket_cliente)
+{
+	int size;
+	char* buffer = recibir_buffer(&size, socket_cliente);
+//	log_info(logger, "Me llego el mensaje %s", buffer);
+	free(buffer);
+}
+
+t_list* recibir_paquete(int socket_cliente)
+{
+	int size;
+	int desplazamiento = 0;
+	void * buffer;
+	t_list* valores = list_create();
+	int tamanio;
+
+	buffer = recibir_buffer(&size, socket_cliente);
+	while(desplazamiento < size)
+	{
+		memcpy(&tamanio, buffer + desplazamiento, sizeof(int));
+		desplazamiento+=sizeof(int);
+		char* valor = malloc(tamanio);
+		memcpy(valor, buffer+desplazamiento, tamanio);
+		desplazamiento+=tamanio;
+		list_add(valores, valor);
+	}
+	free(buffer);
+	return valores;
+}
+
+

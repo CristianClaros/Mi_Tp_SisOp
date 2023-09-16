@@ -6,5 +6,6 @@
 #include "../../shared/include/conexion.h"
 
 int iniciar_cpu(t_config_cpu* cpu_datos, t_log* logger_cpu);
+void procesar_conexion_cpu(t_procesar_conexion_args* void_args);
 
 #endif /* CPU_INCLUDE_CONEXION_H_ */
